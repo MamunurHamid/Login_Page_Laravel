@@ -25,6 +25,7 @@
             <div class="mb-3">
               <label for="exampleInputPassword1" class="form-label">Phone</label>
               <input wire:model="phone" type="text" class="form-control" id="exampleInputPassword1">
+              
               <div>@error('phone')
                 <span class="text-danger" >{{$message}}</span>
                @enderror
