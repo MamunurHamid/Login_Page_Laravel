@@ -4,12 +4,13 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Customer;
+use Auth;
 
 class Customers extends Component
 {
     public $customers = [];
     public $search = '';
-    public $suggestions = '';
+    public $suggestions = [];
 
     public function mount()
     {
@@ -19,35 +20,37 @@ class Customers extends Component
 
     public function render()
     {
-        return view('livewire.customers');
-    }
-
-    public function updatedSearch()
-    {
-        if (strlen($this->search) < 3) {
+        if (!$this->search) {
             $this->customers = Customer::all();
-            $this->suggestions = '';
         } else {
-           
             $this->customers = Customer::where('name', 'like', '%' . $this->search . '%')
                 ->orWhere('email', 'like', '%' . $this->search . '%')
                 ->orWhere('phone', 'like', '%' . $this->search . '%')
                 ->get();
-            
+
             $this->generateSuggestions();
         }
+
+        return view('livewire.customers');
     }
 
     private function generateSuggestions()
     {
-        $this->suggestions = '';
-        foreach ($this->customers as $customer) {
-            $this->suggestions .= $customer->name . ', ' . $customer->email . ', ' . $customer->phone . '; ';
-        }
-        $this->suggestions = rtrim($this->suggestions, '; ');
+        $this->suggestions = Customer::where('name', 'like', '%' . $this->search . '%')
+            ->orWhere('email', 'like', '%' . $this->search . '%')
+            ->orWhere('phone', 'like', '%' . $this->search . '%')
+            ->take(5)
+            ->pluck('name', 'id')
+            ->toArray();
     }
 
-    public function deleteCustomer(Customer $customer)
+    public function selectSuggestion($suggestion)
+    {
+        $this->search = $suggestion;
+        $this->suggestions = [];
+    }
+
+    public function deletecustomer(Customer $customer)
     {
         $customer->delete();
         session()->flash('success', 'Customer Deleted Successfully');

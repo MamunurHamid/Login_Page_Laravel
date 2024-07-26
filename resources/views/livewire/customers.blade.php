@@ -3,8 +3,17 @@
       <div class="col-auto">
         <button wire:navigate href="/customers/create" class="btn btn-success btn-sm">Create</button>
       </div>
-      <div class="col-auto">
-        <input wire:model.live.debounce.150ms="search" type="text" class="form-control" placeholder="{{ empty($suggestions) ? 'search customers' : $suggestions }}" >
+      <div class="col-auto position-relative">
+        <input wire:model.live.debounce.150ms="search" type="text" class="form-control" placeholder="search customers" autocomplete="off">
+        @if(!empty($suggestions))
+            <ul class="list-group position-absolute w-100" style="z-index: 1000;">
+                @foreach($suggestions as $id => $suggestion)
+                    <li class="list-group-item list-group-item-action" wire:click="selectSuggestion('{{ $suggestion }}')">
+                        {{ $suggestion }}
+                    </li>
+                @endforeach
+            </ul>
+        @endif
       </div>
   </div>
   <livewire:flash-message/>
@@ -27,8 +36,8 @@
           <td>{{$customer->phone}}</td>
           <td>
             <button wire:navigate href="/customers/{{$customer->id}}" class="btn btn-primary btn-sm">View</button>
-            <button wire:navigate href="/customers/{{$customer->id}}/edit" class="btn btn-secondary btn-sm" >Edit</button>
-            <button wire:click="deletecustomer({{$customer->id}})" class="btn btn-danger btn-sm" >Delete</button>
+            <button wire:navigate href="/customers/{{$customer->id}}/edit" class="btn btn-secondary btn-sm">Edit</button>
+            <button wire:click="deletecustomer({{$customer->id}})" class="btn btn-danger btn-sm">Delete</button>
           </td>
         </tr>
         @endforeach
